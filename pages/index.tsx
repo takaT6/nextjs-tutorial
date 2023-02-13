@@ -1,13 +1,37 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import { Inter } from '@next/font/google'
-import styles from '@/styles/Home.module.css'
-import { Button } from 'react-bootstrap'
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { db } from "./api/firebase"
+import { useState } from 'react';
 
 const inter = Inter({ subsets: ["latin"] });
 
+type Spot = {
+  name: string,
+  state: string,
+  city: string,
+  address1: string,
+  address2: string,
+  star: number,
+  udate: {
+    nanoseconds: number,
+    seconds: number
+  }
+}
+
 export default function Home() {
+  const [spots, setSpots] = useState(new Array<Spot>(100));
+  useState(() => {
+    db.collection("spots")
+      .orderBy("udate")
+      .limit(50)
+      .onSnapshot((snapshot) => {
+        setSpots(snapshot.docs.map((doc) => doc.data() as Spot));
+      });
+  });
+
+  const checklog = () => {
+    console.log(spots);
+  }
   return (
     <>
       <Head>
@@ -18,7 +42,14 @@ export default function Home() {
       </Head>
       <div className="container mt-5">
         <div className="col-md-11 text-center">
-          <Button href='/titlePage'>Start</Button>
+          <button onClick={checklog}>hoge</button>
+          <div>
+            {spots.map(spot => (
+              <div key={spot.name}>
+                <p>{spot.city}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>
