@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import { Inter } from '@next/font/google'
 import { db } from "./api/firebase"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,15 +19,14 @@ type Spot = {
 }
 
 export default function Home() {
-  const [spots, setSpots] = useState(new Array<Spot>(100));
-  useState(() => {
+  const [spots, setSpots] = useState(Array<Spot>);
+  useEffect(() => {
     db.collection("spots")
-      .orderBy("udate")
-      .limit(50)
       .onSnapshot((snapshot) => {
         setSpots(snapshot.docs.map((doc) => doc.data() as Spot));
       });
-  });
+    console.log("hoge")
+  },[]);
 
   const checklog = () => {
     console.log(spots);
